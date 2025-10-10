@@ -71,18 +71,21 @@
 
       <section id="panel-encode" class="hidden p-4 sm:p-6 space-y-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><label class="block text-sm font-medium">Passenger name</label><input id="name" class="input" value="LE/PHUCANH" /></div>
-          <div><label class="block text-sm font-medium">Legs</label><input id="legs" type="number" min="1" max="4" class="input" value="1" /></div>
+          <div><label class="block text-sm font-medium">Passenger name</label><input id="name" class="input" value="LE/PHUC ANH MR" /></div>
           <div><label class="block text-sm font-medium">PNR</label><input id="pnr" class="input" value="LH8W9P" /></div>
-          <div><label class="block text-sm font-medium">From</label><input id="from" class="input" value="HAN" /></div>
-          <div><label class="block text-sm font-medium">To</label><input id="to" class="input" value="SGN" /></div>
+          <div><label class="block text-sm font-medium">From</label><input id="from" class="input" value="SGN" /></div>
+          <div><label class="block text-sm font-medium">To</label><input id="to" class="input" value="DLI" /></div>
           <div><label class="block text-sm font-medium">Carrier</label><input id="carrier" class="input" value="VN" /></div>
-          <div><label class="block text-sm font-medium">Flight</label><input id="flight" class="input" value="1187" /></div>
+          <div><label class="block text-sm font-medium">Flight</label><input id="flight" class="input" value="1381" /></div>
           <div><label class="block text-sm font-medium">Flight date</label><input id="date" type="date" class="input" /></div>
           <div><label class="block text-sm font-medium">Compartment</label><input id="comp" class="input" value="Y" /></div>
-          <div><label class="block text-sm font-medium">Seat</label><input id="seat" class="input" value="001A" /></div>
-          <div><label class="block text-sm font-medium">Sequence</label><input id="seq" class="input" value="0025" /></div>
-          <div><label class="block text-sm font-medium">Status</label><input id="status" class="input" value="1" /></div>
+          <div><label class="block text-sm font-medium">Seat</label><input id="seat" class="input" value="010B" /></div>
+          <div><label class="block text-sm font-medium">Sequence</label><input id="seq" class="input" value="0002" /></div>
+          <div><label class="block text-sm font-medium">Airline Info</label><input id="airlineInfo" class="input" value="12299" /></div>
+          <div><label class="block text-sm font-medium">Issuance Date</label><input id="issuanceDate" type="date" class="input" /></div>
+          <div><label class="block text-sm font-medium">Document Type</label><input id="docType" class="input" value="B" /></div>
+          <div><label class="block text-sm font-medium">Boarding Pass Issuer Designator</label><input id="issuer" class="input" value="VN" /></div>
+          <div><label class="block text-sm font-medium">Baggage Tag Number</label><input id="baggage" class="input" value="0000000000000" /></div>
         </div>
         <div class="flex gap-2">
           <button id="btnEncode" class="btn btn-primary">Encode</button>
@@ -101,7 +104,7 @@
   </main>
 
   <script>
-    const tabs = { decode:{tab:document.getElementById('tab-decode'),panel:document.getElementById('panel-decode')}, encode:{tab:document.getElementById('tab-encode'),panel:document.getElementById('panel-encode')} };
+    const tabs={decode:{tab:document.getElementById('tab-decode'),panel:document.getElementById('panel-decode')},encode:{tab:document.getElementById('tab-encode'),panel:document.getElementById('panel-encode')}};
     function showTab(name){Object.entries(tabs).forEach(([k,v])=>{const on=k===name;v.panel.classList.toggle('hidden',!on);v.tab.classList.toggle('bg-slate-200',on)});}
     tabs.decode.tab.addEventListener('click',()=>showTab('decode'));
     tabs.encode.tab.addEventListener('click',()=>showTab('encode'));
@@ -111,12 +114,7 @@
     const decodeResult=document.getElementById('decodeResult');
     document.getElementById('btnDecode').addEventListener('click',()=>{
       const txt=decodeInput.value.trim();
-      try {
-        const result=window.bcbp.decode(txt);
-        decodeResult.textContent=JSON.stringify(result,null,2);
-      } catch(e) {
-        decodeResult.textContent='⚠️ Lỗi decode: '+(e.message||e);
-      }
+      try{const result=window.bcbp.decode(txt);decodeResult.textContent=JSON.stringify(result,null,2);}catch(e){decodeResult.textContent='⚠️ Lỗi decode: '+(e.message||e);}
     });
     document.getElementById('btnClearDecode').addEventListener('click',()=>{decodeInput.value='';decodeResult.textContent='';});
     document.getElementById('btnCopyDecodeJson').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(decodeResult.textContent);}catch{}});
@@ -126,6 +124,7 @@
     const dateInput=el('date');
     const now=new Date();
     dateInput.value=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
+    el('issuanceDate').value=dateInput.value;
 
     document.getElementById('btnEncode').addEventListener('click',()=>{
       const payload={
@@ -141,16 +140,21 @@
             compartmentCode:el('comp').value.trim().toUpperCase(),
             seatNumber:el('seat').value.trim().toUpperCase(),
             checkInSequenceNumber:el('seq').value.trim(),
-            passengerStatus:el('status').value.trim()
-          }]
+            airlineInfo:el('airlineInfo').value.trim()
+          }],
+          issuanceDate:new Date(el('issuanceDate').value),
+          documentType:el('docType').value.trim(),
+          boardingPassIssuerDesignator:el('issuer').value.trim(),
+          baggageTagNumber:el('baggage').value.trim()
+        },
+        meta:{
+          formatCode:'M',
+          numberOfLegs:1,
+          versionNumberIndicator:'>',
+          versionNumber:1
         }
       };
-      try {
-        const bc=window.bcbp.encode(payload);
-        encodeResult.textContent=bc;
-      } catch(e) {
-        encodeResult.textContent='⚠️ Lỗi encode: '+(e.message||e);
-      }
+      try{const bc=window.bcbp.encode(payload);encodeResult.textContent=bc;}catch(e){encodeResult.textContent='⚠️ Lỗi encode: '+(e.message||e);}
     });
     document.getElementById('btnCopyBc').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(encodeResult.textContent);}catch{}});
   </script>
