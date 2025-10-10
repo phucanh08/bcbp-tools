@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+      <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
@@ -50,49 +50,77 @@
     <div class="card">
       <div class="border-b border-slate-200 px-4 sm:px-6">
         <nav class="flex gap-2" aria-label="Tabs">
-          <button id="tab-decode" class="tab btn btn-ghost mt-2" data-tab="decode">Decode</button>
-          <button id="tab-encode" class="tab btn btn-ghost mt-2" data-tab="encode">Encode</button>
+          <button id="tab-decode" class="tab btn btn-ghost mt-2" data-tab="decode">Giải mã (Decode)</button>
+          <button id="tab-encode" class="tab btn btn-ghost mt-2" data-tab="encode">Mã hóa (Encode)</button>
         </nav>
       </div>
 
+      <!-- Decode -->
       <section id="panel-decode" class="p-4 sm:p-6 space-y-4">
-        <label class="block text-sm font-medium">BCBP string</label>
+        <label class="block text-sm font-medium">Chuỗi BCBP (BCBP string)</label>
         <textarea id="decodeInput" class="input mono h-32" placeholder="Dán chuỗi BCBP ở đây...">M1LE/PHUCANH           LH8W9P HANSGNVN 1187 120Y001A0025 106&gt;10000</textarea>
         <div class="flex gap-2">
-          <button id="btnDecode" class="btn btn-primary">Decode</button>
-          <button id="btnClearDecode" class="btn btn-ghost">Clear</button>
-          <button id="btnCopyDecodeJson" class="btn btn-ghost">Copy JSON</button>
+          <button id="btnDecode" class="btn btn-primary">Giải mã (Decode)</button>
+          <button id="btnClearDecode" class="btn btn-ghost">Xóa (Clear)</button>
+          <button id="btnCopyDecodeJson" class="btn btn-ghost">Sao chép JSON (Copy JSON)</button>
         </div>
         <div class="mt-4">
-          <h3 class="text-sm font-semibold">Kết quả</h3>
+          <h3 class="text-sm font-semibold">Kết quả (Result)</h3>
           <pre id="decodeResult" class="mono bg-slate-900 text-slate-50 rounded-xl p-4 overflow-auto text-sm"></pre>
+        </div>
+
+        <div class="card p-4 sm:p-6 mt-4">
+          <h3 class="text-base font-semibold mb-2">Giải thích các trường (Field meanings)</h3>
+          <ul class="list-disc ml-5 text-slate-600 text-sm space-y-1">
+            <li><b>data.passengerName (Tên hành khách)</b>: Tên in trên vé, định dạng SURNAME/FIRSTNAME.</li>
+            <li><b>data.legs</b>: Danh sách các chặng bay (flight legs) của hành khách.</li>
+            <li><b>operatingCarrierPNR (Mã đặt chỗ)</b>: Mã đặt chỗ hành khách (PNR).</li>
+            <li><b>departureAirport (Sân bay đi)</b>: Mã IATA sân bay khởi hành (ví dụ: HAN, SGN).</li>
+            <li><b>arrivalAirport (Sân bay đến)</b>: Mã IATA sân bay đến.</li>
+            <li><b>operatingCarrierDesignator (Hãng khai thác)</b>: Mã hãng hàng không (ví dụ: VN, QH).</li>
+            <li><b>flightNumber (Số hiệu chuyến bay)</b>: Số hiệu chuyến bay (ví dụ: 1381).</li>
+            <li><b>flightDate (Ngày bay)</b>: Ngày khởi hành của chuyến bay (UTC).</li>
+            <li><b>compartmentCode (Hạng ghế)</b>: Ký tự thể hiện hạng dịch vụ (Y, J, F...).</li>
+            <li><b>seatNumber (Số ghế)</b>: Số ghế hành khách ngồi (ví dụ: 010B).</li>
+            <li><b>checkInSequenceNumber (Thứ tự check-in)</b>: Số thứ tự hành khách được check-in.</li>
+            <li><b>airlineInfo (Thông tin hãng)</b>: Dữ liệu tự do của hãng, có thể chứa mã dịch vụ nội bộ.</li>
+            <li><b>issuanceDate (Ngày phát hành vé)</b>: Ngày thẻ lên máy bay được in/phát hành.</li>
+            <li><b>documentType (Loại tài liệu)</b>: Mã loại tài liệu (thường là B cho boarding pass).</li>
+            <li><b>boardingPassIssuerDesignator (Mã phát hành thẻ)</b>: Hãng phát hành boarding pass (ví dụ: VN).</li>
+            <li><b>baggageTagNumber (Mã hành lý)</b>: Số thẻ hành lý kèm theo (nếu có).</li>
+            <li><b>meta.formatCode (Mã định dạng)</b>: Luôn là M (mobile/printed boarding pass).</li>
+            <li><b>meta.numberOfLegs (Số chặng bay)</b>: Tổng số chặng (legs) được mã hóa.</li>
+            <li><b>meta.versionNumberIndicator (Ký hiệu version)</b>: Ký hiệu cho biết định dạng có phần mở rộng (>).</li>
+            <li><b>meta.versionNumber (Số version)</b>: Phiên bản BCBP (ví dụ: 1).</li>
+          </ul>
         </div>
       </section>
 
+      <!-- Encode -->
       <section id="panel-encode" class="hidden p-4 sm:p-6 space-y-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><label class="block text-sm font-medium">Passenger name</label><input id="name" class="input" value="LE/PHUC ANH MR" /></div>
-          <div><label class="block text-sm font-medium">PNR</label><input id="pnr" class="input" value="LH8W9P" /></div>
-          <div><label class="block text-sm font-medium">From</label><input id="from" class="input" value="SGN" /></div>
-          <div><label class="block text-sm font-medium">To</label><input id="to" class="input" value="DLI" /></div>
-          <div><label class="block text-sm font-medium">Carrier</label><input id="carrier" class="input" value="VN" /></div>
-          <div><label class="block text-sm font-medium">Flight</label><input id="flight" class="input" value="1381" /></div>
-          <div><label class="block text-sm font-medium">Flight date</label><input id="date" type="date" class="input" /></div>
-          <div><label class="block text-sm font-medium">Compartment</label><input id="comp" class="input" value="Y" /></div>
-          <div><label class="block text-sm font-medium">Seat</label><input id="seat" class="input" value="010B" /></div>
-          <div><label class="block text-sm font-medium">Sequence</label><input id="seq" class="input" value="0002" /></div>
-          <div><label class="block text-sm font-medium">Airline Info</label><input id="airlineInfo" class="input" value="12299" /></div>
-          <div><label class="block text-sm font-medium">Issuance Date</label><input id="issuanceDate" type="date" class="input" /></div>
-          <div><label class="block text-sm font-medium">Document Type</label><input id="docType" class="input" value="B" /></div>
-          <div><label class="block text-sm font-medium">Boarding Pass Issuer Designator</label><input id="issuer" class="input" value="VN" /></div>
-          <div><label class="block text-sm font-medium">Baggage Tag Number</label><input id="baggage" class="input" value="0000000000000" /></div>
+          <div><label class="block text-sm font-medium">Tên hành khách (Passenger name)</label><input id="name" class="input" value="LE/PHUC ANH MR" /><p class="text-xs text-slate-500">Tên in trên vé, định dạng SURNAME/FIRSTNAME.</p></div>
+          <div><label class="block text-sm font-medium">Mã đặt chỗ (PNR)</label><input id="pnr" class="input" value="LH8W9P" /><p class="text-xs text-slate-500">Mã đặt chỗ của hành khách (6 ký tự).</p></div>
+          <div><label class="block text-sm font-medium">Sân bay đi (Departure airport)</label><input id="from" class="input" value="SGN" /><p class="text-xs text-slate-500">Mã IATA của sân bay khởi hành.</p></div>
+          <div><label class="block text-sm font-medium">Sân bay đến (Arrival airport)</label><input id="to" class="input" value="DLI" /><p class="text-xs text-slate-500">Mã IATA của sân bay đến.</p></div>
+          <div><label class="block text-sm font-medium">Hãng khai thác (Operating carrier)</label><input id="carrier" class="input" value="VN" /><p class="text-xs text-slate-500">Mã hãng hàng không khai thác chuyến bay.</p></div>
+          <div><label class="block text-sm font-medium">Số hiệu chuyến bay (Flight number)</label><input id="flight" class="input" value="1381" /><p class="text-xs text-slate-500">Số hiệu của chuyến bay.</p></div>
+          <div><label class="block text-sm font-medium">Ngày bay (Flight date)</label><input id="date" type="date" class="input" /><p class="text-xs text-slate-500">Ngày khởi hành của chuyến bay (UTC).</p></div>
+          <div><label class="block text-sm font-medium">Hạng ghế (Compartment)</label><input id="comp" class="input" value="Y" /><p class="text-xs text-slate-500">Ký tự thể hiện hạng dịch vụ (Y, J, F...).</p></div>
+          <div><label class="block text-sm font-medium">Số ghế (Seat)</label><input id="seat" class="input" value="010B" /><p class="text-xs text-slate-500">Số ghế của hành khách.</p></div>
+          <div><label class="block text-sm font-medium">Thứ tự check-in (Check-in sequence)</label><input id="seq" class="input" value="0002" /><p class="text-xs text-slate-500">Số thứ tự khi hành khách làm thủ tục check-in.</p></div>
+          <div><label class="block text-sm font-medium">Thông tin hãng (Airline info)</label><input id="airlineInfo" class="input" value="12299" /><p class="text-xs text-slate-500">Thông tin tùy chọn của hãng hàng không (5 ký tự).</p></div>
+          <div><label class="block text-sm font-medium">Ngày phát hành (Issuance date)</label><input id="issuanceDate" type="date" class="input" /><p class="text-xs text-slate-500">Ngày thẻ lên máy bay được phát hành.</p></div>
+          <div><label class="block text-sm font-medium">Loại tài liệu (Document type)</label><input id="docType" class="input" value="B" /><p class="text-xs text-slate-500">Loại tài liệu, thường là 'B' cho boarding pass.</p></div>
+          <div><label class="block text-sm font-medium">Mã phát hành thẻ (Issuer designator)</label><input id="issuer" class="input" value="VN" /><p class="text-xs text-slate-500">Hãng phát hành boarding pass.</p></div>
+          <div><label class="block text-sm font-medium">Mã hành lý (Baggage tag number)</label><input id="baggage" class="input" value="0000000000000" /><p class="text-xs text-slate-500">Số thẻ hành lý kèm theo (nếu có).</p></div>
         </div>
         <div class="flex gap-2">
-          <button id="btnEncode" class="btn btn-primary">Encode</button>
-          <button id="btnCopyBc" class="btn btn-ghost">Copy BCBP</button>
+          <button id="btnEncode" class="btn btn-primary">Mã hóa (Encode)</button>
+          <button id="btnCopyBc" class="btn btn-ghost">Sao chép chuỗi (Copy)</button>
         </div>
         <div>
-          <h3 class="text-sm font-semibold">BCBP string</h3>
+          <h3 class="text-sm font-semibold">Chuỗi BCBP (BCBP string)</h3>
           <pre id="encodeResult" class="mono bg-slate-900 text-slate-50 rounded-xl p-4 overflow-auto text-sm"></pre>
         </div>
       </section>
@@ -154,6 +182,7 @@
           versionNumber:1
         }
       };
+      
       try{const bc=window.bcbp.encode(payload);encodeResult.textContent=bc;}catch(e){encodeResult.textContent='⚠️ Lỗi encode: '+(e.message||e);}
     });
     document.getElementById('btnCopyBc').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(encodeResult.textContent);}catch{}});
