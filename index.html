@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BCBP Tools — Encode / Decode</title>
+  <meta name="description" content="Encode & Decode IATA Bar Coded Boarding Pass (BCBP) v6 – offline, client‑side." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,"Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji"}
+    .card{ @apply rounded-2xl shadow-lg border border-slate-200 bg-white; }
+    .input{ @apply w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500; }
+    .btn{ @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-medium shadow-sm; }
+    .btn-primary{ @apply bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800; }
+    .btn-ghost{ @apply bg-slate-100 text-slate-700 hover:bg-slate-200; }
+    .tag{ @apply text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200; }
+    .muted{ @apply text-slate-500; }
+    .mono{ font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace }
+  </style>
+  <!--
+  ============================
+  HOW TO DEPLOY ON GITHUB PAGES
+  ============================
+  1) Tạo repo (ví dụ: phucanh08/bcbp-tools) và bật GitHub Pages (Settings → Pages → Source: `main` / `/root`).
+  2) Commit file này với tên `index.html` ở thư mục gốc.
+  3) Mở URL GitHub Pages của repo để dùng công cụ.
+
+  Tuỳ chọn (nếu bạn muốn dùng thư viện Dart có sẵn):
+  - Biên dịch thư viện Dart `bcbp` của bạn sang JS và gắn vào window.BCBP.encode / window.BCBP.decode.
+    Cách đơn giản là tạo một wrapper (web) trong Dart, rồi `dart compile js` để tạo `assets/bcbp.js`.
+    Sau đó đặt file tại `assets/bcbp.js` trong repo (đường dẫn đã được preload sẵn ở <script> bên dưới).
+  - Nếu không có `assets/bcbp.js`, trang sẽ dùng một bộ mã hoá/giải mã tối giản (primary section) cho BCBP v6.
+    Lưu ý: phiên bản tối giản này hỗ trợ các trường bắt buộc phổ biến; không bao trùm tất cả biến thể đặc tả.
+  -->
+</head>
+<body class="bg-slate-50 min-h-screen">
+  <header class="sticky top-0 z-10 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-9 w-9 grid place-items-center rounded-xl bg-indigo-600 text-white font-bold">BP</div>
+        <div>
+          <h1 class="text-lg font-semibold">BCBP Tools</h1>
+          <p class="text-xs text-slate-500">Encode / Decode IATA Bar Coded Boarding Pass (v6)</p>
+        </div>
+      </div>
+      <a class="btn btn-ghost" href="https://github.com/phucanh08/bcbp" target="_blank" rel="noreferrer">Repo bcbp</a>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-8 space-y-6">
+    <div class="card p-4 sm:p-6">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <span class="tag">Client‑side / Offline</span>
+          <span id="implTag" class="tag">Lite JS impl</span>
+        </div>
+        <div class="text-sm muted">BCBP v6 · Single/Multi‑leg (primary section)</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="card">
+      <div class="border-b border-slate-200 px-4 sm:px-6">
+        <nav class="flex gap-2" aria-label="Tabs">
+          <button id="tab-decode" class="tab btn btn-ghost mt-2" data-tab="decode">Decode</button>
+          <button id="tab-encode" class="tab btn btn-ghost mt-2" data-tab="encode">Encode</button>
+        </nav>
+      </div>
+
+      <!-- Decode Panel -->
+      <section id="panel-decode" class="p-4 sm:p-6 space-y-4">
+        <label class="block text-sm font-medium">BCBP string</label>
+        <textarea id="decodeInput" class="input mono h-32" placeholder="Dán chuỗi BCBP ở đây...">M1LE/PHUCANH           LH8W9P HANSGNVN 1187 120Y001A0025 106&gt;10000</textarea>
+        <div class="flex gap-2">
+          <button id="btnDecode" class="btn btn-primary">Decode</button>
+          <button id="btnClearDecode" class="btn btn-ghost">Clear</button>
+          <button id="btnCopyDecodeJson" class="btn btn-ghost">Copy JSON</button>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-semibold">Kết quả</h3>
+          <pre id="decodeResult" class="mono bg-slate-900 text-slate-50 rounded-xl p-4 overflow-auto text-sm">{/* kết quả sẽ hiển thị ở đây */}</pre>
+        </div>
+      </section>
+
+      <!-- Encode Panel -->
+      <section id="panel-encode" class="hidden p-4 sm:p-6 space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium">Passenger name (SURNAME/FIRST)</label>
+            <input id="name" class="input" placeholder="LE/PHUCANH" value="LE/PHUCANH" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Số chặng (legs encoded)</label>
+            <input id="legs" type="number" min="1" max="4" class="input" value="1" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">PNR (6–7)</label>
+            <input id="pnr" class="input" placeholder="LH8W9P" value="LH8W9P" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">From (IATA 3)</label>
+            <input id="from" class="input" placeholder="HAN" value="HAN" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">To (IATA 3)</label>
+            <input id="to" class="input" placeholder="SGN" value="SGN" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Carrier (IATA/ICAO 2–3)</label>
+            <input id="carrier" class="input" placeholder="VN" value="VN" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Flight number</label>
+            <input id="flight" class="input" placeholder="1187" value="1187" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Flight date</label>
+            <input id="date" type="date" class="input" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Compartment (Y/J/F…)</label>
+            <input id="comp" class="input" placeholder="Y" value="Y" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Seat</label>
+            <input id="seat" class="input" placeholder="001A" value="001A" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Sequence</label>
+            <input id="seq" class="input" placeholder="0025" value="0025" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Status</label>
+            <input id="status" class="input" placeholder="1" value="1" />
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button id="btnEncode" class="btn btn-primary">Encode</button>
+          <button id="btnCopyBc" class="btn btn-ghost">Copy BCBP</button>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold">BCBP string</h3>
+          <pre id="encodeResult" class="mono bg-slate-900 text-slate-50 rounded-xl p-4 overflow-auto text-sm"></pre>
+          <p class="text-xs muted mt-2">Ghi chú: Trình mã hoá tối giản tạo primary section chuẩn (không bao gồm ‘secondary’/optional). Nếu bạn gắn thư viện Dart của bạn, trang sẽ tự dùng encoder/decoder đầy đủ.</p>
+        </div>
+      </section>
+    </div>
+
+    <footer class="py-8 text-center text-sm text-slate-500">
+      <p>Made with ❤️ for devs. MIT.</p>
+    </footer>
+  </main>
+
+  <script>
+    // Try to load optional Dart→JS bundle, if present at assets/bcbp.js
+    (function(){
+      const s = document.createElement('script');
+      s.src = 'assets/bcbp.js';
+      s.defer = true;
+      s.onload = ()=>{
+        const tag = document.getElementById('implTag');
+        if (window.BCBP && (window.BCBP.encode || window.BCBP.decode)) {
+          tag.textContent = 'Dart bcbp.js';
+          tag.classList.remove('bg-indigo-50','text-indigo-700','border-indigo-200');
+          tag.classList.add('bg-emerald-50','text-emerald-700','border-emerald-200');
+        }
+      };
+      s.onerror = ()=>{/* silently ignore */};
+      document.head.appendChild(s);
+    })();
+
+    // Simple tab switch
+    const tabs = {
+      decode: {
+        tab: document.getElementById('tab-decode'),
+        panel: document.getElementById('panel-decode')
+      },
+      encode: {
+        tab: document.getElementById('tab-encode'),
+        panel: document.getElementById('panel-encode')
+      }
+    };
+    function showTab(name){
+      Object.entries(tabs).forEach(([k,v])=>{
+        const on = (k===name);
+        v.panel.classList.toggle('hidden', !on);
+        v.tab.classList.toggle('bg-slate-200', on);
+      });
+    }
+    tabs.decode.tab.addEventListener('click', ()=>showTab('decode'));
+    tabs.encode.tab.addEventListener('click', ()=>showTab('encode'));
+    showTab('decode');
+
+    // ======================
+    // Minimal BCBP v6 helper
+    // ======================
+    // This covers the PRIMARY SECTION for common fields. It assumes fixed-width where applicable.
+    // Spec reference (simplified for common airlines):
+    // [0]  Format Code: 1 char (e.g., 'M')
+    // [1]  Number of Legs Encoded: 1 char (digit)
+    // [2]  Passenger Name: 20 chars (SURNAME/FIRSTNAME) padded spaces
+    // [3]  Electronic Ticket Indicator: 1 char (usually 'E' or space; many encodings place a space)
+    // Then for EACH LEG (we support legs=1 in encoder; decoder attempts to parse more):
+    // [4]  PNR: 7 chars (A-Z0-9) padded spaces
+    // [5]  From: 3 chars IATA
+    // [6]  To: 3 chars IATA
+    // [7]  Carrier: 3 chars (IATA/ICAO padded)
+    // [8]  Flight number: 5 chars (right-aligned, left-padded spaces)
+    // [9]  Julian date of flight: 3 chars (001-366)
+    // [10] Compartment code: 1 char
+    // [11] Seat number: 4 chars (right-aligned, left-padded spaces)
+    // [12] Check-in sequence: 5 chars (right-aligned, left-padded spaces)
+    // [13] Passenger status: 1 char
+    // (Optional/secondary fields like version, field size, etc. are not handled here.)
+
+    const padRight = (s,len,ch=' ')=> (s??'').toString().slice(0,len).padEnd(len,ch);
+    const padLeft  = (s,len,ch=' ')=> (s??'').toString().slice(0,len).padStart(len,ch);
+
+    function toJulian(date){
+      const d = new Date(date);
+      const start = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+      const diff = Math.floor((d - start) / 86400000) + 1; // 1..366
+      return padLeft(diff,3,'0');
+    }
+
+    function fromJulian(year, j){
+      const day = parseInt(j,10);
+      const dt = new Date(Date.UTC(year,0,1));
+      dt.setUTCDate(day);
+      return dt;
+    }
+
+    const LiteBCBP = {
+      encodePrimary({
+        formatCode='M',
+        legs=1,
+        name='LE/PHUCANH',
+        pnr='LH8W9P',
+        from='HAN',
+        to='SGN',
+        carrier='VN',
+        flight='1187',
+        dateStr=null, // ISO yyyy-mm-dd
+        comp='Y',
+        seat='001A',
+        seq='0025',
+        status='1',
+        etktIndicator=' ' // many real strings have a space; use 'E' if needed
+      }){
+        const julian = toJulian(dateStr||new Date());
+        const fc = formatCode.slice(0,1) || 'M';
+        const nlegs = String(legs).slice(0,1) || '1';
+        const name20 = padRight(name,20,' ');
+        const pnr7 = padRight(pnr,7,' ');
+        const from3 = padRight(from,3,' ');
+        const to3 = padRight(to,3,' ');
+        const carr3 = padRight(carrier,3,' ');
+        const flt5 = padLeft(flight,5,' ');
+        const jul3 = padLeft(julian,3,'0');
+        const comp1 = padRight(comp,1,' ');
+        const seat4 = padLeft(seat,4,' ');
+        const seq5  = padLeft(seq,5,' ');
+        const stat1 = padRight(status,1,' ');
+        const etkt1 = padRight(etktIndicator,1,' ');
+        return `${fc}${nlegs}${name20}${etkt1}${pnr7}${from3}${to3}${carr3}${flt5}${jul3}${comp1}${seat4}${seq5}${stat1}`;
+      },
+
+      decodePrimary(s, opts={ referenceYear: (new Date()).getUTCFullYear() }){
+        const out = {
+          formatCode: s.slice(0,1),
+          numberOfLegs: s.slice(1,2),
+          name: s.slice(2,22).trimEnd(),
+          electronicTicketIndicator: s.slice(22,23) || ' ',
+          legs: []
+        };
+        let idx = 23;
+        const legs = parseInt(out.numberOfLegs||'1',10) || 1;
+        for (let i=0;i<legs;i++){
+          const leg = {
+            pnr: s.slice(idx, idx+=7).trim(),
+            from: s.slice(idx, idx+=3).trim(),
+            to:   s.slice(idx, idx+=3).trim(),
+            carrier: s.slice(idx, idx+=3).trim(),
+            flight: s.slice(idx, idx+=5).trim(),
+            julianDate: s.slice(idx, idx+=3),
+            compartment: s.slice(idx, idx+=1).trim(),
+            seat: s.slice(idx, idx+=4).trim(),
+            sequence: s.slice(idx, idx+=5).trim(),
+            status: s.slice(idx, idx+=1).trim(),
+          };
+          const year = opts.referenceYear || (new Date()).getUTCFullYear();
+          try {
+            const iso = fromJulian(year, leg.julianDate).toISOString();
+            leg.flightDate = iso;
+          } catch(e) { /* ignore */ }
+          out.legs.push(leg);
+        }
+        out._rawRemainder = s.slice(idx);
+        return out;
+      }
+    };
+
+    // Wire up Decode UI
+    const decodeInput = document.getElementById('decodeInput');
+    const decodeResult = document.getElementById('decodeResult');
+    document.getElementById('btnDecode').addEventListener('click', ()=>{
+      const txt = (decodeInput.value||'').trim();
+      try{
+        let result;
+        if (window.BCBP && typeof window.BCBP.decode === 'function') {
+          result = window.BCBP.decode(txt); // expected to return object
+        } else {
+          result = LiteBCBP.decodePrimary(txt);
+        }
+        decodeResult.textContent = JSON.stringify(result, null, 2);
+      }catch(e){
+        decodeResult.textContent = '⚠️ Lỗi decode: ' + (e?.message||e);
+      }
+    });
+    document.getElementById('btnClearDecode').addEventListener('click', ()=>{
+      decodeInput.value='';
+      decodeResult.textContent='';
+    });
+    document.getElementById('btnCopyDecodeJson').addEventListener('click', async()=>{
+      try{ await navigator.clipboard.writeText(decodeResult.textContent||''); }catch{}
+    });
+
+    // Wire up Encode UI
+    const el = id=>document.getElementById(id);
+    const encodeResult = el('encodeResult');
+    const dateInput = el('date');
+    // default date today
+    const tzNow = new Date();
+    dateInput.value = new Date(tzNow.getTime()-tzNow.getTimezoneOffset()*60000).toISOString().slice(0,10);
+
+    document.getElementById('btnEncode').addEventListener('click', ()=>{
+      const payload = {
+        name: el('name').value.trim(),
+        legs: Math.max(1, Math.min(4, parseInt(el('legs').value||'1',10)||1)),
+        pnr: el('pnr').value.trim(),
+        from: el('from').value.trim().toUpperCase(),
+        to: el('to').value.trim().toUpperCase(),
+        carrier: el('carrier').value.trim().toUpperCase(),
+        flight: el('flight').value.trim(),
+        dateStr: el('date').value,
+        comp: el('comp').value.trim().toUpperCase(),
+        seat: el('seat').value.trim().toUpperCase(),
+        seq: el('seq').value.trim(),
+        status: el('status').value.trim(),
+      };
+      try{
+        let bc;
+        if (window.BCBP && typeof window.BCBP.encode === 'function') {
+          bc = window.BCBP.encode(payload); // your Dart wrapper should accept a JS object
+        } else {
+          if (payload.legs !== 1) throw new Error('Lite encoder hiện chỉ hỗ trợ 1 chặng (legs=1).');
+          bc = LiteBCBP.encodePrimary(payload);
+        }
+        encodeResult.textContent = bc;
+      }catch(e){
+        encodeResult.textContent = '⚠️ Lỗi encode: ' + (e?.message||e);
+      }
+    });
+    document.getElementById('btnCopyBc').addEventListener('click', async()=>{
+      try{ await navigator.clipboard.writeText(encodeResult.textContent||''); }catch{}
+    });
+  </script>
+</body>
+</html>
