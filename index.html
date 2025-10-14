@@ -1,191 +1,334 @@
       <!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BCBP Tools — Encode / Decode</title>
-  <meta name="description" content="Encode & Decode IATA Bar Coded Boarding Pass (BCBP) v6 – powered by bcbp@6.0.2." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bcbp@6.0.2/dist/index.umd.js"></script>
-  <style>
-    html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,"Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji"}
-    .card{ @apply rounded-2xl shadow-lg border border-slate-200 bg-white; }
-    .input{ @apply w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500; }
-    .btn{ @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-medium shadow-sm; }
-    .btn-primary{ @apply bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800; }
-    .btn-ghost{ @apply bg-slate-100 text-slate-700 hover:bg-slate-200; }
-    .tag{ @apply text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200; }
-    .muted{ @apply text-slate-500; }
-    .mono{ font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace }
-  </style>
-</head>
-<body class="bg-slate-50 min-h-screen">
-  <header class="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-slate-200">
-    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="h-9 w-9 grid place-items-center rounded-xl bg-indigo-600 text-white font-bold">BP</div>
-        <div>
-          <h1 class="text-lg font-semibold">BCBP Tools</h1>
-          <p class="text-xs text-slate-500">Encode / Decode IATA Bar Coded Boarding Pass (v6)</p>
-        </div>
-      </div>
-      <a class="btn btn-ghost" href="https://github.com/phucanh08/bcbp" target="_blank" rel="noreferrer">Repo bcbp</a>
-    </div>
-  </header>
+      <html lang="vi">
+        <head>
+          <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <title>BCBP Tools — Encode / Decode</title>
+          <meta name="description" content="Encode & Decode IATA Bar Coded Boarding Pass (BCBP) v6 – powered by bcbp@6.0.2." />
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+          <script src="https://cdn.tailwindcss.com"></script>
+          <script src="https://cdn.jsdelivr.net/npm/bcbp@6.0.2/dist/index.umd.js"></script>
+          <style>
+            html,
+            body {
+              font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji"
+            }
 
-  <main class="max-w-5xl mx-auto px-4 py-8 space-y-6">
-    <div class="card p-4 sm:p-6">
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center gap-2">
-          <span class="tag">Client-side / Offline</span>
-          <span class="tag bg-emerald-50 text-emerald-700 border-emerald-200">bcbp@6.0.2</span>
-        </div>
-        <div class="text-sm muted">BCBP v6 · Multi-leg supported</div>
-      </div>
-    </div>
+            .card {
+              @apply rounded-2xl shadow-lg border border-slate-200 bg-white;
+            }
 
-    <div class="card">
-      <div class="border-b border-slate-200 px-4 sm:px-6">
-        <nav class="flex gap-2" aria-label="Tabs">
-          <button id="tab-decode" class="tab btn btn-ghost mt-2" data-tab="decode">Giải mã (Decode)</button>
-          <button id="tab-encode" class="tab btn btn-ghost mt-2" data-tab="encode">Mã hóa (Encode)</button>
-        </nav>
-      </div>
+            .input {
+              @apply w-full rounded-xl border border-slate-300 px-3 py-2 focus: outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500;
+            }
 
-      <!-- Decode -->
-      <section id="panel-decode" class="p-4 sm:p-6 space-y-4">
-        <label class="block text-sm font-medium">Chuỗi BCBP (BCBP string)</label>
-        <textarea id="decodeInput" class="input mono h-32" placeholder="Dán chuỗi BCBP ở đây...">M1LE/PHUCANH           LH8W9P HANSGNVN 1187 120Y001A0025 106&gt;10000</textarea>
-        <div class="flex gap-2">
-          <button id="btnDecode" class="btn btn-primary">Giải mã (Decode)</button>
-          <button id="btnClearDecode" class="btn btn-ghost">Xóa (Clear)</button>
-          <button id="btnCopyDecodeJson" class="btn btn-ghost">Sao chép JSON (Copy JSON)</button>
-        </div>
-        <div class="mt-4">
-          <h3 class="text-sm font-semibold">Kết quả (Result)</h3>
-          <pre id="decodeResult" class="mono bg-slate-900 text-slate-50 rounded-xl p-4 overflow-auto text-sm"></pre>
-        </div>
+            .btn {
+              @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-medium shadow-sm;
+            }
 
-        <div class="card p-4 sm:p-6 mt-4">
-          <h3 class="text-base font-semibold mb-2">Giải thích các trường (Field meanings)</h3>
-          <ul class="list-disc ml-5 text-slate-600 text-sm space-y-1">
-            <li><b>data.passengerName (Tên hành khách)</b>: Tên in trên vé, định dạng SURNAME/FIRSTNAME.</li>
-            <li><b>data.legs</b>: Danh sách các chặng bay (flight legs) của hành khách.</li>
-            <li><b>operatingCarrierPNR (Mã đặt chỗ)</b>: Mã đặt chỗ hành khách (PNR).</li>
-            <li><b>departureAirport (Sân bay đi)</b>: Mã IATA sân bay khởi hành (ví dụ: HAN, SGN).</li>
-            <li><b>arrivalAirport (Sân bay đến)</b>: Mã IATA sân bay đến.</li>
-            <li><b>operatingCarrierDesignator (Hãng khai thác)</b>: Mã hãng hàng không (ví dụ: VN, QH).</li>
-            <li><b>flightNumber (Số hiệu chuyến bay)</b>: Số hiệu chuyến bay (ví dụ: 1381).</li>
-            <li><b>flightDate (Ngày bay)</b>: Ngày khởi hành của chuyến bay (UTC).</li>
-            <li><b>compartmentCode (Hạng ghế)</b>: Ký tự thể hiện hạng dịch vụ (Y, J, F...).</li>
-            <li><b>seatNumber (Số ghế)</b>: Số ghế hành khách ngồi (ví dụ: 010B).</li>
-            <li><b>checkInSequenceNumber (Thứ tự check-in)</b>: Số thứ tự hành khách được check-in.</li>
-            <li><b>airlineInfo (Thông tin hãng)</b>: Dữ liệu tự do của hãng, có thể chứa mã dịch vụ nội bộ.</li>
-            <li><b>issuanceDate (Ngày phát hành vé)</b>: Ngày thẻ lên máy bay được in/phát hành.</li>
-            <li><b>documentType (Loại tài liệu)</b>: Mã loại tài liệu (thường là B cho boarding pass).</li>
-            <li><b>boardingPassIssuerDesignator (Mã phát hành thẻ)</b>: Hãng phát hành boarding pass (ví dụ: VN).</li>
-            <li><b>baggageTagNumber (Mã hành lý)</b>: Số thẻ hành lý kèm theo (nếu có).</li>
-            <li><b>meta.formatCode (Mã định dạng)</b>: Luôn là M (mobile/printed boarding pass).</li>
-            <li><b>meta.numberOfLegs (Số chặng bay)</b>: Tổng số chặng (legs) được mã hóa.</li>
-            <li><b>meta.versionNumberIndicator (Ký hiệu version)</b>: Ký hiệu cho biết định dạng có phần mở rộng (>).</li>
-            <li><b>meta.versionNumber (Số version)</b>: Phiên bản BCBP (ví dụ: 1).</li>
-          </ul>
-        </div>
-      </section>
+            .btn-primary {
+              @apply bg-indigo-600 text-white hover: bg-indigo-700 active:bg-indigo-800;
+            }
 
-      <!-- Encode -->
-      <section id="panel-encode" class="hidden p-4 sm:p-6 space-y-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><label class="block text-sm font-medium">Tên hành khách (Passenger name)</label><input id="name" class="input" value="LE/PHUC ANH MR" /><p class="text-xs text-slate-500">Tên in trên vé, định dạng SURNAME/FIRSTNAME.</p></div>
-          <div><label class="block text-sm font-medium">Mã đặt chỗ (PNR)</label><input id="pnr" class="input" value="LH8W9P" /><p class="text-xs text-slate-500">Mã đặt chỗ của hành khách (6 ký tự).</p></div>
-          <div><label class="block text-sm font-medium">Sân bay đi (Departure airport)</label><input id="from" class="input" value="SGN" /><p class="text-xs text-slate-500">Mã IATA của sân bay khởi hành.</p></div>
-          <div><label class="block text-sm font-medium">Sân bay đến (Arrival airport)</label><input id="to" class="input" value="DLI" /><p class="text-xs text-slate-500">Mã IATA của sân bay đến.</p></div>
-          <div><label class="block text-sm font-medium">Hãng khai thác (Operating carrier)</label><input id="carrier" class="input" value="VN" /><p class="text-xs text-slate-500">Mã hãng hàng không khai thác chuyến bay.</p></div>
-          <div><label class="block text-sm font-medium">Số hiệu chuyến bay (Flight number)</label><input id="flight" class="input" value="1381" /><p class="text-xs text-slate-500">Số hiệu của chuyến bay.</p></div>
-          <div><label class="block text-sm font-medium">Ngày bay (Flight date)</label><input id="date" type="date" class="input" /><p class="text-xs text-slate-500">Ngày khởi hành của chuyến bay (UTC).</p></div>
-          <div><label class="block text-sm font-medium">Hạng ghế (Compartment)</label><input id="comp" class="input" value="Y" /><p class="text-xs text-slate-500">Ký tự thể hiện hạng dịch vụ (Y, J, F...).</p></div>
-          <div><label class="block text-sm font-medium">Số ghế (Seat)</label><input id="seat" class="input" value="010B" /><p class="text-xs text-slate-500">Số ghế của hành khách.</p></div>
-          <div><label class="block text-sm font-medium">Thứ tự check-in (Check-in sequence)</label><input id="seq" class="input" value="0002" /><p class="text-xs text-slate-500">Số thứ tự khi hành khách làm thủ tục check-in.</p></div>
-          <div><label class="block text-sm font-medium">Thông tin hãng (Airline info)</label><input id="airlineInfo" class="input" value="12299" /><p class="text-xs text-slate-500">Thông tin tùy chọn của hãng hàng không (5 ký tự).</p></div>
-          <div><label class="block text-sm font-medium">Ngày phát hành (Issuance date)</label><input id="issuanceDate" type="date" class="input" /><p class="text-xs text-slate-500">Ngày thẻ lên máy bay được phát hành.</p></div>
-          <div><label class="block text-sm font-medium">Loại tài liệu (Document type)</label><input id="docType" class="input" value="B" /><p class="text-xs text-slate-500">Loại tài liệu, thường là 'B' cho boarding pass.</p></div>
-          <div><label class="block text-sm font-medium">Mã phát hành thẻ (Issuer designator)</label><input id="issuer" class="input" value="VN" /><p class="text-xs text-slate-500">Hãng phát hành boarding pass.</p></div>
-          <div><label class="block text-sm font-medium">Mã hành lý (Baggage tag number)</label><input id="baggage" class="input" value="0000000000000" /><p class="text-xs text-slate-500">Số thẻ hành lý kèm theo (nếu có).</p></div>
-        </div>
-        <div class="flex gap-2">
-          <button id="btnEncode" class="btn btn-primary">Mã hóa (Encode)</button>
-          <button id="btnCopyBc" class="btn btn-ghost">Sao chép chuỗi (Copy)</button>
-        </div>
-        <div>
-          <h3 class="text-sm font-semibold">Chuỗi BCBP (BCBP string)</h3>
-          <pre id="encodeResult" class="mono bg-slate-900 text-slate-50 rounded-xl p-4 overflow-auto text-sm"></pre>
-        </div>
-      </section>
-    </div>
+            .btn-ghost {
+              @apply bg-slate-100 text-slate-700 hover: bg-slate-200;
+            }
 
-    <footer class="py-8 text-center text-sm text-slate-500">
-      <p>Made with ❤️ · MIT License</p>
-    </footer>
-  </main>
+            .tag {
+              @apply text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200;
+            }
 
-  <script>
-    const tabs={decode:{tab:document.getElementById('tab-decode'),panel:document.getElementById('panel-decode')},encode:{tab:document.getElementById('tab-encode'),panel:document.getElementById('panel-encode')}};
-    function showTab(name){Object.entries(tabs).forEach(([k,v])=>{const on=k===name;v.panel.classList.toggle('hidden',!on);v.tab.classList.toggle('bg-slate-200',on)});}
-    tabs.decode.tab.addEventListener('click',()=>showTab('decode'));
-    tabs.encode.tab.addEventListener('click',()=>showTab('encode'));
-    showTab('decode');
+            .muted {
+              @apply text-slate-500;
+            }
 
-    const decodeInput=document.getElementById('decodeInput');
-    const decodeResult=document.getElementById('decodeResult');
-    document.getElementById('btnDecode').addEventListener('click',()=>{
-      const txt=decodeInput.value.trim();
-      try{const result=window.bcbp.decode(txt);decodeResult.textContent=JSON.stringify(result,null,2);}catch(e){decodeResult.textContent='⚠️ Lỗi decode: '+(e.message||e);}
-    });
-    document.getElementById('btnClearDecode').addEventListener('click',()=>{decodeInput.value='';decodeResult.textContent='';});
-    document.getElementById('btnCopyDecodeJson').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(decodeResult.textContent);}catch{}});
+            .mono {
+              font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace
+            }
+          </style>
+        </head>
+        <body class="bg-slate-50 min-h-screen">
+          <header class="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-slate-200">
+            <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="h-9 w-9 grid place-items-center rounded-xl bg-indigo-600 text-white font-bold">BP</div>
+                <div>
+                  <h1 class="text-lg font-semibold">BCBP Tools</h1>
+                  <p class="text-xs text-slate-500">Encode / Decode IATA Bar Coded Boarding Pass (v6)</p>
+                </div>
+              </div>
+              <a class="btn btn-ghost" href="https://github.com/phucanh08/bcbp" target="_blank" rel="noreferrer">Repo bcbp</a>
+            </div>
+          </header>
+          <main class="max-w-5xl mx-auto px-4 py-8 space-y-6">
+            <div class="card p-4 sm:p-6">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                  <span class="tag">Client-side / Offline</span>
+                  <span class="tag bg-emerald-50 text-emerald-700 border-emerald-200">bcbp@6.0.2</span>
+                </div>
+                <div class="text-sm muted">BCBP v6 · Multi-leg supported</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="border-b border-slate-200 px-4 sm:px-6">
+                <nav class="flex gap-2" aria-label="Tabs">
+                  <button id="tab-decode" class="tab btn btn-ghost mt-2" data-tab="decode">Giải mã (Decode)</button>
+                  <button id="tab-encode" class="tab btn btn-ghost mt-2" data-tab="encode">Mã hóa (Encode)</button>
+                </nav>
+              </div>
+              <!-- Decode -->
+              <section id="panel-decode" class="p-4 sm:p-6 space-y-4">
+                <label class="block text-sm font-medium">Chuỗi BCBP (BCBP string)</label>
+                <textarea id="decodeInput" class="input mono h-32" placeholder="Dán chuỗi BCBP ở đây...">M1LE/PHUCANH           LH8W9P HANSGNVN 1187 120Y001A0025 106&gt;10000</textarea>
+                <div class="flex gap-2">
+                  <button id="btnDecode" class="btn btn-primary">Giải mã (Decode)</button>
+                  <button id="btnClearDecode" class="btn btn-ghost">Xóa (Clear)</button>
+                  <button id="btnCopyDecodeJson" class="btn btn-ghost">Sao chép JSON (Copy JSON)</button>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-sm font-semibold">Kết quả (Result)</h3>
+                  <pre id="decodeResult" class="mono bg-slate-900 text-slate-50 rounded-xl p-4 overflow-auto text-sm"></pre>
+                </div>
+                <!-- ✅ Barcode PDF417 cho phần Decode -->
+                <div id="decodeBarcodeContainer" class="text-center mt-4 hidden">
+                  <img id="decodeBarcodeImg" alt="PDF417 Barcode" class="mx-auto" style="max-width:350px;height:auto;">
+                  <p class="text-xs text-slate-500 mt-2">BCBP Barcode (PDF417)</p>
+                </div>
+                <div class="card p-4 sm:p-6 mt-4">
+                  <h3 class="text-base font-semibold mb-2">Giải thích các trường (Field meanings)</h3>
+                  <ul class="list-disc ml-5 text-slate-600 text-sm space-y-1">
+                    <li>
+                      <b>data.passengerName</b>: Tên hành khách — định dạng SURNAME/FIRSTNAME.
+                    </li>
+                    <li>
+                      <b>data.legs</b>: Danh sách các chặng bay (flight legs).
+                    </li>
+                    <li>
+                      <b>operatingCarrierPNR</b>: Mã đặt chỗ (PNR).
+                    </li>
+                    <li>
+                      <b>departureAirport</b>: Sân bay đi (IATA code).
+                    </li>
+                    <li>
+                      <b>arrivalAirport</b>: Sân bay đến (IATA code).
+                    </li>
+                    <li>
+                      <b>operatingCarrierDesignator</b>: Hãng khai thác.
+                    </li>
+                    <li>
+                      <b>flightNumber</b>: Số hiệu chuyến bay.
+                    </li>
+                    <li>
+                      <b>flightDate</b>: Ngày bay (UTC).
+                    </li>
+                    <li>
+                      <b>compartmentCode</b>: Hạng ghế (Y, J, F...).
+                    </li>
+                    <li>
+                      <b>seatNumber</b>: Số ghế.
+                    </li>
+                    <li>
+                      <b>checkInSequenceNumber</b>: Thứ tự check-in.
+                    </li>
+                    <li>
+                      <b>airlineInfo</b>: Thông tin hãng tùy chọn.
+                    </li>
+                    <li>
+                      <b>issuanceDate</b>: Ngày phát hành vé.
+                    </li>
+                    <li>
+                      <b>documentType</b>: Loại tài liệu (B: boarding pass).
+                    </li>
+                    <li>
+                      <b>boardingPassIssuerDesignator</b>: Hãng phát hành thẻ.
+                    </li>
+                    <li>
+                      <b>baggageTagNumber</b>: Mã hành lý (nếu có).
+                    </li>
+                  </ul>
+                </div>
+              </section>
+              <!-- Encode -->
+              <section id="panel-encode" class="hidden p-4 sm:p-6 space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium">Tên hành khách (Passenger name)</label>
+                    <input id="name" class="input" value="LE/PHUC ANH MR" />
+                    <p class="text-xs text-slate-500">Tên in trên vé, định dạng SURNAME/FIRSTNAME.</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Mã đặt chỗ (PNR)</label>
+                    <input id="pnr" class="input" value="LH8W9P" />
+                    <p class="text-xs text-slate-500">Mã đặt chỗ của hành khách (6 ký tự).</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Sân bay đi (Departure airport)</label>
+                    <input id="from" class="input" value="SGN" />
+                    <p class="text-xs text-slate-500">Mã IATA của sân bay khởi hành.</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Sân bay đến (Arrival airport)</label>
+                    <input id="to" class="input" value="DLI" />
+                    <p class="text-xs text-slate-500">Mã IATA của sân bay đến.</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Hãng khai thác (Operating carrier)</label>
+                    <input id="carrier" class="input" value="VN" />
+                    <p class="text-xs text-slate-500">Mã hãng hàng không khai thác chuyến bay.</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Số hiệu chuyến bay (Flight number)</label>
+                    <input id="flight" class="input" value="1381" />
+                    <p class="text-xs text-slate-500">Số hiệu của chuyến bay.</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Ngày bay (Flight date)</label>
+                    <input id="date" type="date" class="input" />
+                    <p class="text-xs text-slate-500">Ngày khởi hành của chuyến bay (UTC).</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Hạng ghế (Compartment)</label>
+                    <input id="comp" class="input" value="Y" />
+                    <p class="text-xs text-slate-500">Ký tự thể hiện hạng dịch vụ (Y, J, F...).</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Số ghế (Seat)</label>
+                    <input id="seat" class="input" value="010B" />
+                    <p class="text-xs text-slate-500">Số ghế của hành khách.</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Thứ tự check-in (Check-in sequence)</label>
+                    <input id="seq" class="input" value="0002" />
+                    <p class="text-xs text-slate-500">Số thứ tự khi hành khách làm thủ tục check-in.</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Thông tin hãng (Airline info)</label>
+                    <input id="airlineInfo" class="input" value="12299" />
+                    <p class="text-xs text-slate-500">Thông tin tùy chọn của hãng hàng không (5 ký tự).</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Ngày phát hành (Issuance date)</label>
+                    <input id="issuanceDate" type="date" class="input" />
+                    <p class="text-xs text-slate-500">Ngày thẻ lên máy bay được phát hành.</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Loại tài liệu (Document type)</label>
+                    <input id="docType" class="input" value="B" />
+                    <p class="text-xs text-slate-500">Loại tài liệu, thường là 'B' cho boarding pass.</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Mã phát hành thẻ (Issuer designator)</label>
+                    <input id="issuer" class="input" value="VN" />
+                    <p class="text-xs text-slate-500">Hãng phát hành boarding pass.</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Mã hành lý (Baggage tag number)</label>
+                    <input id="baggage" class="input" value="0000000000000" />
+                    <p class="text-xs text-slate-500">Số thẻ hành lý kèm theo (nếu có).</p>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <button id="btnEncode" class="btn btn-primary">Mã hóa (Encode)</button>
+                  <button id="btnCopyBc" class="btn btn-ghost">Sao chép chuỗi (Copy)</button>
+                </div>
+                <div>
+                  <h3 class="text-sm font-semibold">Chuỗi BCBP (BCBP string)</h3>
+                  <pre id="encodeResult" class="mono bg-slate-900 text-slate-50 rounded-xl p-4 overflow-auto text-sm"></pre>
+                </div>
+                <!-- ✅ Barcode PDF417 -->
+                <div id="barcodeContainer" class="text-center mt-4 hidden">
+                  <img id="barcodeImg" alt="PDF417 Barcode" class="mx-auto" style="max-width:350px;height:auto;">
+                  <p class="text-xs text-slate-500 mt-2">BCBP Barcode (PDF417)</p>
+                </div>
+              </section>
+            </div>
+            <footer class="py-8 text-center text-sm text-slate-500">
+              <p>Made with ❤️ · MIT License</p>
+            </footer>
+          </main>
+          <script>
+            // Tabs
+            const tabs = {
+              decode: {
+                tab: document.getElementById('tab-decode'),
+                panel: document.getElementById('panel-decode')
+              },
+              encode: {
+                tab: document.getElementById('tab-encode'),
+                panel: document.getElementById('panel-encode')
+              }
+            };
 
-    const el=id=>document.getElementById(id);
-    const encodeResult=el('encodeResult');
-    const dateInput=el('date');
-    const now=new Date();
-    dateInput.value=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
-    el('issuanceDate').value=dateInput.value;
-
-    document.getElementById('btnEncode').addEventListener('click',()=>{
-      const payload={
-        data:{
-          passengerName:el('name').value.trim(),
-          legs:[{
-            operatingCarrierPNR:el('pnr').value.trim(),
-            departureAirport:el('from').value.trim().toUpperCase(),
-            arrivalAirport:el('to').value.trim().toUpperCase(),
-            operatingCarrierDesignator:el('carrier').value.trim().toUpperCase(),
-            flightNumber:el('flight').value.trim(),
-            flightDate:new Date(el('date').value),
-            compartmentCode:el('comp').value.trim().toUpperCase(),
-            seatNumber:el('seat').value.trim().toUpperCase(),
-            checkInSequenceNumber:el('seq').value.trim(),
-            airlineInfo:el('airlineInfo').value.trim()
-          }],
-          issuanceDate:new Date(el('issuanceDate').value),
-          documentType:el('docType').value.trim(),
-          boardingPassIssuerDesignator:el('issuer').value.trim(),
-          baggageTagNumber:el('baggage').value.trim()
-        },
-        meta:{
-          formatCode:'M',
-          numberOfLegs:1,
-          versionNumberIndicator:'>',
-          versionNumber:1
-        }
-      };
+            function showTab(name) {
+              Object.entries(tabs).forEach(([k, v]) => {
+                const on = k === name;
+                v.panel.classList.toggle('hidden', !on);
+                v.tab.classList.toggle('bg-slate-200', on)
+              });
+            }
+            tabs.decode.tab.addEventListener('click', () => showTab('decode'));
+            tabs.encode.tab.addEventListener('click', () => showTab('encode'));
+            showTab('decode');
+            // Decode logic
+            const decodeInput = document.getElementById('decodeInput');
+            const decodeResult = document.getElementById('decodeResult');
+            const decodeBarcodeContainer = document.getElementById('decodeBarcodeContainer');
+            const decodeBarcodeImg = document.getElementById('decodeBarcodeImg');
+            document.getElementById('btnDecode').addEventListener('click', () => {
+              const txt = decodeInput.value.trim();
+              try {
+                const result = window.bcbp.decode(txt);
+                decodeResult.textContent = JSON.stringify(result, null, 2);
+                const url = "https://barcode.tec-it.com/barcode.ashx?data=" + encodeURIComponent(txt) + "&code=PDF417";
+                decodeBarcodeImg.src = url;
+                decodeBarcodeContainer.classList.remove('hidden');
+              } catch (e) {
+                decodeResult.textContent = '⚠️ Lỗi decode: ' + (e.message || e);
+                decodeBarcodeContainer.classList.add('hidden');
+              }
+            });
+            document.getElementById('btnClearDecode').addEventListener('click', () => {
+              decodeInput.value = '';
+              decodeResult.textContent = '';
+              decodeBarcodeContainer.classList.add('hidden');
+            });
+            document.getElementById('btnCopyDecodeJson').addEventListener('click', async () => {
+              try {
+                await navigator.clipboard.writeText(decodeResult.textContent);
+              } catch {}
+            });
+            // Encode logic
+            const el = id => document.getElementById(id);
+            const encodeResult = el('encodeResult');
+            const barcodeContainer = el('barcodeContainer');
+            const barcodeImg = el('barcodeImg');
+            const dateInput = el('date');
+            const now = new Date();
+            dateInput.value = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+            el('issuanceDate').value = dateInput.value;
+            document.getElementById('btnEncode').addEventListener('click', () => {
+              const payload = {
+                /* giữ nguyên payload như bản trước */ };
+              try {
+                const bc = window.bcbp.encode(payload);
+                encodeResult.textContent = bc;
+                const url = "https://barcode.tec-it.com/barcode.ashx?data=" + encodeURIComponent(bc) + "&code=PDF417";
+                barcodeImg.src = url;
+                barcodeContainer.classList.remove('hidden');
+              } catch (e) {
+                encodeResult.textContent = '⚠️ Lỗi encode: ' + (e.message || e);
+                barcodeContainer.classList.add('hidden');
+              }
+            });
+            document.getElementById('btnCopyBc').addEventListener('click', async () => {
+              try {
+                await navigator.clipboard.writeText(encodeResult.textContent);
+              } catch {}
+            });
+          </script>
+        </body>
+      </html>
       
-      try{const bc=window.bcbp.encode(payload);encodeResult.textContent=bc;}catch(e){encodeResult.textContent='⚠️ Lỗi encode: '+(e.message||e);}
-    });
-    document.getElementById('btnCopyBc').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(encodeResult.textContent);}catch{}});
-  </script>
-</body>
-</html>
