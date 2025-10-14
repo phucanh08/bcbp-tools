@@ -82,7 +82,7 @@
         <!-- Decode -->
         <section id="panel-decode" class="p-4 sm:p-6 space-y-4">
           <label class="block text-sm font-medium">Chuỗi BCBP (BCBP string)</label>
-          <textarea id="decodeInput" class="input mono h-32" placeholder="Dán chuỗi BCBP ở đây...">M1LE/PHUCANH           LH8W9P HANSGNVN 1187 120Y001A0025 106&gt;10000</textarea>
+          <textarea id="decodeInput" class="w-full rounded-xl border border-slate-300 p-2 mono h-32" placeholder="Dán chuỗi BCBP ở đây...">M1LE/PHUCANH           LH8W9P HANSGNVN 1187 120Y001A0025 106&gt;10000</textarea>
           <div class="flex gap-2">
             <button id="btnDecode" class="btn btn-primary">Giải mã (Decode)</button>
             <button id="btnClearDecode" class="btn btn-ghost">Xóa (Clear)</button>
@@ -95,7 +95,6 @@
           <!-- ✅ Barcode PDF417 cho phần Decode -->
           <div id="decodeBarcodeContainer" class="text-center mt-4 hidden">
             <img id="decodeBarcodeImg" alt="PDF417 Barcode" class="mx-auto" style="max-width:350px;height:auto;">
-            <p class="text-xs text-slate-500 mt-2">BCBP Barcode (PDF417)</p>
           </div>
           <div class="card p-4 sm:p-6 mt-4">
             <h3 class="text-base font-semibold mb-2">Giải thích các trường (Field meanings)</h3>
@@ -156,77 +155,77 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium">Tên hành khách (Passenger name)</label>
-              <input id="name" class="input" value="LE/PHUC ANH MR" />
+              <input id="name" class="w-full border rounded p-2" value="LE/PHUC ANH MR" />
               <p class="text-xs text-slate-500">Tên in trên vé, định dạng SURNAME/FIRSTNAME.</p>
             </div>
             <div>
               <label class="block text-sm font-medium">Mã đặt chỗ (PNR)</label>
-              <input id="pnr" class="input" value="LH8W9P" />
+              <input id="pnr" class="w-full border rounded p-2" value="LH8W9P" />
               <p class="text-xs text-slate-500">Mã đặt chỗ của hành khách (6 ký tự).</p>
             </div>
             <div>
               <label class="block text-sm font-medium">Sân bay đi (Departure airport)</label>
-              <input id="from" class="input" value="SGN" />
+              <input id="from" class="w-full border rounded p-2" value="SGN" />
               <p class="text-xs text-slate-500">Mã IATA của sân bay khởi hành.</p>
             </div>
             <div>
               <label class="block text-sm font-medium">Sân bay đến (Arrival airport)</label>
-              <input id="to" class="input" value="DLI" />
+              <input id="to" class="w-full border rounded p-2" value="DLI" />
               <p class="text-xs text-slate-500">Mã IATA của sân bay đến.</p>
             </div>
             <div>
               <label class="block text-sm font-medium">Hãng khai thác (Operating carrier)</label>
-              <input id="carrier" class="input" value="VN" />
+              <input id="carrier" class="w-full border rounded p-2" value="VN" />
               <p class="text-xs text-slate-500">Mã hãng hàng không khai thác chuyến bay.</p>
             </div>
             <div>
               <label class="block text-sm font-medium">Số hiệu chuyến bay (Flight number)</label>
-              <input id="flight" class="input" value="1381" />
+              <input id="flight" class="w-full border rounded p-2" value="1381" />
               <p class="text-xs text-slate-500">Số hiệu của chuyến bay.</p>
             </div>
             <div>
               <label class="block text-sm font-medium">Ngày bay (Flight date)</label>
-              <input id="date" type="date" class="input" />
+              <input id="date" type="date" class="w-full border rounded p-2" />
               <p class="text-xs text-slate-500">Ngày khởi hành của chuyến bay (UTC).</p>
             </div>
             <div>
               <label class="block text-sm font-medium">Hạng ghế (Compartment)</label>
-              <input id="comp" class="input" value="Y" />
+              <input id="comp" class="w-full border rounded p-2" value="Y" />
               <p class="text-xs text-slate-500">Ký tự thể hiện hạng dịch vụ (Y, J, F...).</p>
             </div>
             <div>
               <label class="block text-sm font-medium">Số ghế (Seat)</label>
-              <input id="seat" class="input" value="010B" />
+              <input id="seat" class="w-full border rounded p-2" value="010B" />
               <p class="text-xs text-slate-500">Số ghế của hành khách.</p>
             </div>
             <div>
               <label class="block text-sm font-medium">Thứ tự check-in (Check-in sequence)</label>
-              <input id="seq" class="input" value="0002" />
+              <input id="seq" class="w-full border rounded p-2" value="0002" />
               <p class="text-xs text-slate-500">Số thứ tự khi hành khách làm thủ tục check-in.</p>
             </div>
             <div>
               <label class="block text-sm font-medium">Thông tin hãng (Airline info)</label>
-              <input id="airlineInfo" class="input" value="12299" />
+              <input id="airlineInfo" class="w-full border rounded p-2" value="12299" />
               <p class="text-xs text-slate-500">Thông tin tùy chọn của hãng hàng không (5 ký tự).</p>
             </div>
             <div>
               <label class="block text-sm font-medium">Ngày phát hành (Issuance date)</label>
-              <input id="issuanceDate" type="date" class="input" />
+              <input id="issuanceDate" type="date" class="w-full border rounded p-2" />
               <p class="text-xs text-slate-500">Ngày thẻ lên máy bay được phát hành.</p>
             </div>
             <div>
               <label class="block text-sm font-medium">Loại tài liệu (Document type)</label>
-              <input id="docType" class="input" value="B" />
+              <input id="docType" class="w-full border rounded p-2" value="B" />
               <p class="text-xs text-slate-500">Loại tài liệu, thường là 'B' cho boarding pass.</p>
             </div>
             <div>
               <label class="block text-sm font-medium">Mã phát hành thẻ (Issuer designator)</label>
-              <input id="issuer" class="input" value="VN" />
+              <input id="issuer" class="w-full border rounded p-2" value="VN" />
               <p class="text-xs text-slate-500">Hãng phát hành boarding pass.</p>
             </div>
             <div>
               <label class="block text-sm font-medium">Mã hành lý (Baggage tag number)</label>
-              <input id="baggage" class="input" value="0000000000000" />
+              <input id="baggage" class="w-full border rounded p-2" value="0000000000000" />
               <p class="text-xs text-slate-500">Số thẻ hành lý kèm theo (nếu có).</p>
             </div>
           </div>
@@ -241,7 +240,6 @@
           <!-- ✅ Barcode PDF417 -->
           <div id="barcodeContainer" class="text-center mt-4 hidden">
             <img id="barcodeImg" alt="PDF417 Barcode" class="mx-auto" style="max-width:350px;height:auto;">
-            <p class="text-xs text-slate-500 mt-2">BCBP Barcode (PDF417)</p>
           </div>
         </section>
       </div>
