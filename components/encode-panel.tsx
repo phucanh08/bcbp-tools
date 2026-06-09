@@ -322,7 +322,8 @@ export function EncodePanel() {
               </button>
             </div>
             <div className="overflow-x-auto rounded-md bg-neutral-50 p-4">
-              <code className="block break-all font-mono text-xs text-neutral-800">{result}</code>
+              {/* whitespace-pre-wrap preserves the BCBP padding spaces (HTML would otherwise collapse them) */}
+              <code className="block whitespace-pre-wrap break-all font-mono text-xs text-neutral-800">{result}</code>
             </div>
             <Pdf417Barcode text={result} alt="PDF417 barcode for encoded BCBP string" />
           </CardContent>
