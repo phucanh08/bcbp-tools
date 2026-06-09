@@ -10,6 +10,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/bcbp@6.0.2/dist/index.umd.js"></script>
+    <!-- PDF417 barcode generated locally via @barcode-bakery/barcode-pdf417 (vendored in ./lib).
+         Loaded as classic scripts (expose window.BarcodeBakery) so the page works when opened
+         directly from the filesystem (file://), where ES module imports are blocked by CORS. -->
+    <script src="./lib/barcode-common.js"></script>
+    <script src="./lib/barcode-pdf417.js"></script>
     <style>
       html,
       body {
@@ -68,6 +73,7 @@
           <div class="flex items-center gap-2">
             <span class="tag">Client-side / Offline</span>
             <span class="tag bg-emerald-50 text-emerald-700 border-emerald-200">bcbp@6.0.2</span>
+            <span class="tag bg-amber-50 text-amber-700 border-amber-200">PDF417 local</span>
           </div>
           <div class="text-sm muted">BCBP v6 · Multi-leg supported</div>
         </div>
@@ -248,6 +254,36 @@
       </footer>
     </main>
     <script>
+      // PDF417 generation (client-side, no external API).
+      // BarcodeBakery globals are provided by the vendored ./lib classic scripts loaded above.
+      const { BCGpdf417, BCGColor, BCGDrawing } = window.BarcodeBakery;
+
+      // Browser surface factory: BCGDrawing draws onto a canvas it sizes itself.
+      const createSurface = (w, h) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        return { context: canvas.getContext('2d'), createSurface };
+      };
+
+      // Render `text` as a PDF417 barcode, returns a PNG data URL.
+      function renderPdf417(text) {
+        const code = new BCGpdf417();
+        code.setScale(3);
+        // Match TEC-IT's aspect ratio: their auto-sizer makes wider symbols
+        // (e.g. 4 columns / 8 rows for ~30 chars). The lib's default ratio=1
+        // yields a tall narrow strip (1 column). ratio=0.2 reproduces TEC-IT's
+        // column count and grows columns as data length increases.
+        // Error-correction level is left automatic (matches TEC-IT for typical data).
+        code.setRatio(0.2);
+        code.setForegroundColor(new BCGColor(0, 0, 0));
+        code.setBackgroundColor(new BCGColor(255, 255, 255));
+        code.parse(text);
+        const drawing = new BCGDrawing(createSurface);
+        drawing.draw(code);
+        return drawing.getImage().context.canvas.toDataURL('image/png');
+      }
+
       // Tabs
       const tabs = {
         decode: {
@@ -280,8 +316,7 @@
         try {
           const result = window.bcbp.decode(txt);
           decodeResult.textContent = JSON.stringify(result, null, 2);
-          const url = "https://barcode.tec-it.com/barcode.ashx?data=" + encodeURIComponent(txt) + "&code=PDF417";
-          decodeBarcodeImg.src = url;
+          decodeBarcodeImg.src = renderPdf417(txt);
           decodeBarcodeContainer.classList.remove('hidden');
         } catch (e) {
           decodeResult.textContent = '⚠️ Lỗi decode: ' + (e.message || e);
@@ -338,8 +373,7 @@
         try {
           const bc = window.bcbp.encode(payload);
           encodeResult.textContent = bc;
-          const url = "https://barcode.tec-it.com/barcode.ashx?data=" + encodeURIComponent(bc) + "&code=PDF417";
-          barcodeImg.src = url;
+          barcodeImg.src = renderPdf417(bc);
           barcodeContainer.classList.remove('hidden');
         } catch (e) {
           encodeResult.textContent = '⚠️ Lỗi encode: ' + (e.message || e);
