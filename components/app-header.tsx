@@ -19,7 +19,7 @@ export function AppHeader() {
             <div className="mb-3 flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element -- static export; logo is a plain public asset */}
               <img
-                src="/logo.png"
+                src="/logo.webp"
                 alt="BCBP Tools logo"
                 width={40}
                 height={40}
