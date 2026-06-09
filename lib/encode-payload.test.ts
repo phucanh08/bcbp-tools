@@ -3,7 +3,7 @@ import {
   buildBcbpPayload,
   createDefaultEncodeFormData,
   getMissingRequiredEncodeFields,
-  parseLocalDateInput,
+  parseDateInput,
 } from './encode-payload';
 
 describe('encode payload helpers', () => {
@@ -88,24 +88,27 @@ describe('encode payload helpers', () => {
       },
     });
 
-    expect(payload.data.legs[0].flightDate).toEqual(parseLocalDateInput('2026-06-09'));
-    expect(payload.data.issuanceDate).toEqual(parseLocalDateInput('2026-06-09'));
+    expect(payload.data.legs[0].flightDate).toEqual(parseDateInput('2026-06-09'));
+    expect(payload.data.issuanceDate).toEqual(parseDateInput('2026-06-09'));
   });
 
-  it('parses date inputs as local calendar dates at year boundaries', () => {
-    const newYear = parseLocalDateInput('2026-01-01');
-    const yearEnd = parseLocalDateInput('2026-12-31');
+  it('anchors date inputs at UTC midnight so the encoded day-of-year is timezone-independent', () => {
+    const newYear = parseDateInput('2026-01-01');
+    const yearEnd = parseDateInput('2026-12-31');
 
     expect({
-      year: newYear.getFullYear(),
-      month: newYear.getMonth(),
-      day: newYear.getDate(),
+      year: newYear.getUTCFullYear(),
+      month: newYear.getUTCMonth(),
+      day: newYear.getUTCDate(),
     }).toEqual({ year: 2026, month: 0, day: 1 });
 
     expect({
-      year: yearEnd.getFullYear(),
-      month: yearEnd.getMonth(),
-      day: yearEnd.getDate(),
+      year: yearEnd.getUTCFullYear(),
+      month: yearEnd.getUTCMonth(),
+      day: yearEnd.getUTCDate(),
     }).toEqual({ year: 2026, month: 11, day: 31 });
+
+    // UTC midnight regardless of host timezone
+    expect(newYear.toISOString()).toBe('2026-01-01T00:00:00.000Z');
   });
 });

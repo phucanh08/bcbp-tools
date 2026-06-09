@@ -50,9 +50,12 @@ export function getLocalDateInputValue(date = new Date()): string {
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 }
 
-export function parseLocalDateInput(value: string): Date {
+// The bcbp library derives the day-of-year from the Date's UTC fields, so the
+// calendar date must be anchored at UTC midnight (not local midnight). Using
+// local midnight caused a timezone off-by-one (e.g. UTC+7 encoded the day before).
+export function parseDateInput(value: string): Date {
   const [year, month, day] = value.split('-').map(Number);
-  return new Date(year, month - 1, day);
+  return new Date(Date.UTC(year, month - 1, day));
 }
 
 export function createDefaultEncodeFormData(dateValue = getLocalDateInputValue()): EncodeFormData {
@@ -90,14 +93,14 @@ export function buildBcbpPayload(formData: EncodeFormData): BcbpPayload {
           arrivalAirport: formData.toAirport.trim().toUpperCase(),
           operatingCarrierDesignator: formData.carrier.trim().toUpperCase(),
           flightNumber: formData.flightNumber.trim(),
-          flightDate: parseLocalDateInput(formData.flightDate),
+          flightDate: parseDateInput(formData.flightDate),
           compartmentCode: formData.compartment.trim().toUpperCase(),
           seatNumber: formData.seatNumber.trim().toUpperCase(),
           checkInSequenceNumber: formData.checkInSeq.trim(),
           airlineInfo: formData.airlineInfo.trim(),
         },
       ],
-      issuanceDate: parseLocalDateInput(formData.issuanceDate),
+      issuanceDate: parseDateInput(formData.issuanceDate),
       documentType: formData.documentType.trim(),
       boardingPassIssuerDesignator: formData.issuer.trim().toUpperCase(),
       baggageTagNumber: formData.baggage.trim(),
