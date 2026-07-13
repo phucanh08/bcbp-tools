@@ -245,6 +245,15 @@ export function EncodePanel() {
               maxLength={5}
             />
             <Field
+              field="passengerStatus"
+              label="Trạng thái hành khách"
+              value={formData.passengerStatus}
+              onChange={updateField}
+              placeholder="1"
+              helperText="0: chưa check-in, 1: đã check-in"
+              maxLength={1}
+            />
+            <Field
               field="airlineInfo"
               label="Airline info"
               value={formData.airlineInfo}

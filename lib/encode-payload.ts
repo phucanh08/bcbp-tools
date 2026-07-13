@@ -9,6 +9,7 @@ export interface EncodeFormData {
   compartment: string;
   seatNumber: string;
   checkInSeq: string;
+  passengerStatus: string;
   airlineInfo: string;
   issuanceDate: string;
   documentType: string;
@@ -29,6 +30,7 @@ export interface BcbpPayload {
       compartmentCode: string;
       seatNumber: string;
       checkInSequenceNumber: string;
+      passengerStatus: string;
       airlineInfo: string;
     }>;
     issuanceDate: Date;
@@ -70,6 +72,7 @@ export function createDefaultEncodeFormData(dateValue = getLocalDateInputValue()
     compartment: 'Y',
     seatNumber: '010B',
     checkInSeq: '0002',
+    passengerStatus: '1',
     airlineInfo: '12299',
     issuanceDate: dateValue,
     documentType: 'B',
@@ -97,6 +100,7 @@ export function buildBcbpPayload(formData: EncodeFormData): BcbpPayload {
           compartmentCode: formData.compartment.trim().toUpperCase(),
           seatNumber: formData.seatNumber.trim().toUpperCase(),
           checkInSequenceNumber: formData.checkInSeq.trim(),
+          passengerStatus: formData.passengerStatus.trim(),
           airlineInfo: formData.airlineInfo.trim(),
         },
       ],
