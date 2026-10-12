@@ -1,27 +1,20 @@
-import { FlatCompat } from '@eslint/eslintrc';
+import { defineConfig, globalIgnores } from 'eslint/config';
+import nextVitals from 'eslint-config-next/core-web-vitals';
+import nextTs from 'eslint-config-next/typescript';
 
-const compat = new FlatCompat({
-  baseDirectory: import.meta.dirname,
-});
+// eslint-config-next 16 ships native flat configs, so FlatCompat is no longer needed.
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  globalIgnores([
+    '.next/**',
+    'node_modules/**',
+    'out/**',
+    'build/**',
+    'next-env.d.ts',
+    'lib/barcode-*.js',
+    'public/barcode-*.js',
+  ]),
+]);
 
-const eslintConfig = compat.extends(
-  'eslint-config-next/core-web-vitals.js',
-  'eslint-config-next/typescript.js',
-);
-
-const config = [
-  {
-    ignores: [
-      '.next/**',
-      'node_modules/**',
-      'out/**',
-      'build/**',
-      'next-env.d.ts',
-      'lib/barcode-*.js',
-      'public/barcode-*.js',
-    ],
-  },
-  ...eslintConfig,
-];
-
-export default config;
+export default eslintConfig;
