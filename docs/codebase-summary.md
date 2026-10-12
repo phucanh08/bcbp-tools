@@ -31,6 +31,7 @@ BCBP Tools is a NextJS 15 browser application for encoding and decoding IATA Bar
 ### `lib/`
 - `encode-payload.ts` defines encode form types, default values, required-field checks, and the one-leg BCBP payload builder.
 - `bcbp-client.ts` lazy-loads the `bcbp` package on the client and validates the exposed API boundary.
+- `bcbp-input.ts` normalizes pasted decode input: strips leading whitespace and trailing line breaks, keeps trailing BCBP padding spaces (covered by `bcbp-input.test.ts`).
 - `pdf417.ts` validates browser-only execution, waits for `window.BarcodeBakery`, and renders PNG data URLs through canvas.
 - `qr-code.ts` renders QR SVG data URLs (error correction M, 4-module quiet zone) without trimming the input.
 - `qr-code.test.ts` round-trips rendered QR output through `jsqr` to check exact text, including padding spaces.
@@ -53,4 +54,4 @@ BCBP Tools is a NextJS 15 browser application for encoding and decoding IATA Bar
 - Encode flow currently supports one leg only.
 - All BCBP data processing is client-side; no app API or persistence layer exists.
 - PDF417 rendering depends on browser globals supplied by public vendor scripts.
-- The app currently builds as a standard NextJS application. Static export and GitHub Pages deployment are not configured yet.
+- The app is a static export (`output: 'export'`) deployed to GitHub Pages (`bcbp.anhlp.com`) by `.github/workflows/deploy.yml` on push to `main`.

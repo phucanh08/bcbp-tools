@@ -35,16 +35,16 @@ Start the development server:
 npm run dev
 ```
 
-Build production output:
+Build the static export (written to `out/`):
 
 ```powershell
 npm run build
 ```
 
-Run the production server after a successful build:
+Preview the static export locally after a successful build (`npm run start` does not work with `output: 'export'`):
 
 ```powershell
-npm run start
+npx serve out
 ```
 
 Run unit tests:
@@ -59,9 +59,9 @@ Run lint:
 npm run lint
 ```
 
-## Deployment note
+## Deployment
 
-The current config builds and serves as a standard NextJS app. Static export or GitHub Pages deployment is not configured yet. If GitHub Pages remains the target, add the required `next.config.ts` export/base-path settings and document the deploy command before publishing.
+The app is a static export (`output: 'export'` in `next.config.ts`) hosted on GitHub Pages at the custom domain [bcbp.anhlp.com](https://bcbp.anhlp.com), so no base path is needed. `.github/workflows/deploy.yml` deploys on every push to `main` (or a manual run): `npm ci` → `npm run build` → adds `out/.nojekyll` and copies `CNAME` into `out/` → publishes `out/` to Pages.
 
 ## Architecture at a glance
 
@@ -70,6 +70,7 @@ The current config builds and serves as a standard NextJS app. Static export or 
 - `components/ui/` contains focused shadcn/ui primitives
 - `lib/encode-payload.ts` builds the one-leg BCBP payload
 - `lib/bcbp-client.ts` loads the BCBP library on the client
+- `lib/bcbp-input.ts` normalizes pasted decode input without dropping trailing padding spaces
 - `lib/pdf417.ts` renders PDF417 using browser canvas and `window.BarcodeBakery`
 - `lib/qr-code.ts` renders the exact BCBP string (padding spaces included) as a QR SVG data URL
 - `components/bcbp-barcode.tsx` lets users switch between PDF417 and QR output

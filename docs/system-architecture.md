@@ -60,7 +60,7 @@ BCBP Tools is a client-first NextJS 15 application. It uses the app router for d
 - Browser global `window.BarcodeBakery` supplied by public scripts.
 
 ### Validation points
-- Decode path rejects empty trimmed strings.
+- Decode path rejects empty or whitespace-only input; `normalizeBcbpInput` strips leading whitespace and trailing line breaks but keeps trailing padding spaces.
 - Encode path rejects missing required fields.
 - Encode path rejects invalid date strings before payload construction.
 - `bcbp-client.ts` rejects malformed module shape.
@@ -68,9 +68,10 @@ BCBP Tools is a client-first NextJS 15 application. It uses the app router for d
 
 ## Deployment Model
 
-- The app builds as a standard NextJS application with `npm run build`.
-- Public vendor assets ship with the Next build output.
-- Static export and GitHub Pages deployment are not configured yet.
+- `next.config.ts` sets `output: 'export'`; `npm run build` writes a fully static site to `out/`.
+- Public vendor assets ship with the static export.
+- `.github/workflows/deploy.yml` deploys to GitHub Pages on push to `main` (or manual dispatch): `npm ci` → `npm run build` → `out/.nojekyll` + `CNAME` copied into `out/` → Pages artifact upload and deploy.
+- Served at the root of the custom domain `bcbp.anhlp.com`, so no `basePath` is configured.
 - No API routes, database, authentication, or server mutations are present.
 
 ## Known Scope Limits
