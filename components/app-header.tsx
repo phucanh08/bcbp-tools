@@ -33,7 +33,7 @@ export function AppHeader() {
             </p>
             <div className="flex flex-wrap gap-3 text-sm text-neutral-500">
               <StatusBullet lang="en">Client-side processing</StatusBullet>
-              <StatusBullet lang="en">PDF417 compatible</StatusBullet>
+              <StatusBullet lang="en">PDF417 &amp; QR codes</StatusBullet>
               <StatusBullet lang="en">Multi-leg support</StatusBullet>
             </div>
           </div>

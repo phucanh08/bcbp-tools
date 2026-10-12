@@ -3,7 +3,7 @@
 import { ChevronRight, Copy, Lock, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { Pdf417Barcode } from '@/components/pdf417-barcode';
+import { BcbpBarcode } from '@/components/bcbp-barcode';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -319,7 +319,7 @@ export function EncodePanel() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <h3 className="text-sm font-semibold text-neutral-900">Chuỗi BCBP</h3>
-                <p className="text-xs text-neutral-500">Kết quả mã hóa sẵn sàng để sao chép hoặc tạo PDF417</p>
+                <p className="text-xs text-neutral-500">Kết quả mã hóa sẵn sàng để sao chép hoặc tạo mã PDF417/QR</p>
               </div>
               <button
                 type="button"
@@ -334,7 +334,7 @@ export function EncodePanel() {
               {/* whitespace-pre-wrap preserves the BCBP padding spaces (HTML would otherwise collapse them) */}
               <code className="block whitespace-pre-wrap break-all font-mono text-xs text-neutral-800">{result}</code>
             </div>
-            <Pdf417Barcode text={result} alt="PDF417 barcode for encoded BCBP string" />
+            <BcbpBarcode text={result} subject="encoded BCBP string" />
           </CardContent>
         </Card>
       ) : (
@@ -342,7 +342,7 @@ export function EncodePanel() {
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-neutral-100">
             <Lock className="h-6 w-6 text-neutral-400" />
           </div>
-          <p className="text-sm text-neutral-500">Điền thông tin chuyến bay để tạo chuỗi BCBP và mã PDF417</p>
+          <p className="text-sm text-neutral-500">Điền thông tin chuyến bay để tạo chuỗi BCBP và mã PDF417/QR</p>
         </div>
       )}
     </div>

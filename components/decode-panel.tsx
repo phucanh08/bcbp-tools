@@ -3,7 +3,7 @@
 import { ChevronRight, Copy, RotateCcw } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { Pdf417Barcode } from '@/components/pdf417-barcode';
+import { BcbpBarcode } from '@/components/bcbp-barcode';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -142,7 +142,7 @@ export function DecodePanel() {
         </div>
       )}
 
-      <Pdf417Barcode text={barcodeText} alt="PDF417 barcode for decoded BCBP input" />
+      <BcbpBarcode text={barcodeText} subject="decoded BCBP input" />
     </div>
   );
 }

@@ -7,6 +7,7 @@ NextJS browser tool for encoding and decoding IATA Bar Coded Boarding Pass (BCBP
 - Decode a BCBP string with `bcbp@6.0.2`
 - Encode a one-leg BCBP string with `bcbp@6.0.2`
 - Render PDF417 barcodes locally in the browser with vendored Barcode Bakery scripts
+- Render the same BCBP string as a QR code (PDF417 | QR toggle) with the `qrcode` package
 - Copy decoded JSON or encoded string to clipboard
 - Keep all boarding pass processing client-side
 
@@ -18,6 +19,7 @@ NextJS browser tool for encoding and decoding IATA Bar Coded Boarding Pass (BCBP
 - shadcn/ui-style Radix primitives
 - `bcbp@6.0.2`
 - Vendored Barcode Bakery PDF417 scripts under `public/`
+- `qrcode` for client-side QR SVG rendering (error correction level M)
 
 ## Run
 
@@ -69,6 +71,8 @@ The current config builds and serves as a standard NextJS app. Static export or 
 - `lib/encode-payload.ts` builds the one-leg BCBP payload
 - `lib/bcbp-client.ts` loads the BCBP library on the client
 - `lib/pdf417.ts` renders PDF417 using browser canvas and `window.BarcodeBakery`
+- `lib/qr-code.ts` renders the exact BCBP string (padding spaces included) as a QR SVG data URL
+- `components/bcbp-barcode.tsx` lets users switch between PDF417 and QR output
 - `public/barcode-common.js` and `public/barcode-pdf417.js` are loaded by `app/layout.tsx`
 
 ## Scope

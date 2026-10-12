@@ -37,6 +37,8 @@ BCBP Tools is a client-first NextJS 15 application. It uses the app router for d
 - It waits for vendor script readiness through `waitForPdf417Ready`.
 - It calls `renderPdf417` to produce a PNG data URL.
 - Rendering failures are surfaced to users through toast notifications.
+- `components/bcbp-barcode.tsx` wraps PDF417 and QR output in a PDF417 | QR tab control (PDF417 by default).
+- `components/qr-code-barcode.tsx` calls `renderQrCode` from `lib/qr-code.ts`, which uses the `qrcode` package to produce an SVG data URL from the exact BCBP string.
 
 ### 4. Integration Layer
 - `lib/bcbp-client.ts` is the boundary around the external `bcbp` package.
