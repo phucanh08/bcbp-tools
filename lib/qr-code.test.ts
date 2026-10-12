@@ -1,5 +1,6 @@
 import jsQR from 'jsqr';
 import { describe, expect, it } from 'vitest';
+import { normalizeBcbpInput } from './bcbp-input';
 import { renderQrCode } from './qr-code';
 
 // Real-shaped BCBP M1 string with padding spaces (name field and conditional section).
@@ -77,6 +78,14 @@ describe('QR code rendering', () => {
     const padded = '  M1TEST/PAX   ';
 
     expect(decodeSvgDataUrl(await renderQrCode(padded))).toBe(padded);
+  });
+
+  it('round-trips a pasted BCBP with trailing padding spaces after normalizeBcbpInput', async () => {
+    const withTrailingPadding = `${BCBP_WITH_PADDING}   `;
+    const barcodeText = normalizeBcbpInput(`${withTrailingPadding}\r\n`);
+
+    expect(barcodeText).toBe(withTrailingPadding);
+    expect(decodeSvgDataUrl(await renderQrCode(barcodeText))).toBe(withTrailingPadding);
   });
 
   it('rejects empty text', async () => {

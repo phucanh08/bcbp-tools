@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { decodeBcbp } from '@/lib/bcbp-client';
+import { normalizeBcbpInput } from '@/lib/bcbp-input';
 
 const exampleBCBP = 'M1LE/PHUCANH           LH8W9P HANSGNVN 1187 120Y001A0025 106>10000';
 
@@ -20,7 +21,8 @@ export function DecodePanel() {
   const decodeRequestId = useRef(0);
 
   async function handleDecode() {
-    const text = input.trim();
+    // Keep trailing padding spaces: they are part of the fixed-width BCBP data.
+    const text = normalizeBcbpInput(input);
 
     if (!text) {
       toast.error('Vui lòng nhập chuỗi BCBP');
@@ -100,7 +102,7 @@ export function DecodePanel() {
       </Card>
 
       <div className="flex flex-wrap gap-2">
-        <Button onClick={handleDecode} disabled={!input.trim() || isDecoding}>
+        <Button onClick={handleDecode} disabled={!normalizeBcbpInput(input) || isDecoding}>
           {isDecoding ? 'Đang giải mã' : 'Giải mã'}
           <ChevronRight className="h-4 w-4" />
         </Button>
