@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22 # Node 22 LTS (Node 20 reached end-of-life in April 2026)
           cache: npm
 
       - name: Install dependencies

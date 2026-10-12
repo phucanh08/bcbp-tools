@@ -41,7 +41,7 @@ Build the static export (written to `out/`):
 npm run build
 ```
 
-Preview the static export locally after a successful build (`npm run start` does not work with `output: 'export'`):
+Preview the static export locally after a successful build (there is no `npm start`: `next start` does not work with `output: 'export'`, so serve `out/` with any static file server):
 
 ```powershell
 npx serve out
@@ -61,7 +61,7 @@ npm run lint
 
 ## Deployment
 
-The app is a static export (`output: 'export'` in `next.config.ts`) hosted on GitHub Pages at the custom domain [bcbp.anhlp.com](https://bcbp.anhlp.com), so no base path is needed. `.github/workflows/deploy.yml` deploys on every push to `main` (or a manual run): `npm ci` → `npm run build` → adds `out/.nojekyll` and copies `CNAME` into `out/` → publishes `out/` to Pages.
+The app is a static export (`output: 'export'` in `next.config.ts`) hosted on GitHub Pages at the custom domain [bcbp.anhlp.com](https://bcbp.anhlp.com), so no base path is needed. `.github/workflows/deploy.yml` deploys on every push to `main` (or a manual run) on Node 22 LTS: `npm ci` → `npm run build` → adds `out/.nojekyll` and copies `CNAME` into `out/` → publishes `out/` to Pages.
 
 ## Architecture at a glance
 
